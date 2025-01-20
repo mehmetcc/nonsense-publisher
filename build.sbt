@@ -27,4 +27,4 @@ lazy val root = (project in file("."))
 enablePlugins(JavaAppPackaging)
 enablePlugins(DockerPlugin)
 
-dockerBaseImage := "eclipse-temurin:17-jdk" // Base Docker image
+dockerBaseImage := "eclipse-temurin:19-jdk" // Base Docker image
