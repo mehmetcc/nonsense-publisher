@@ -11,12 +11,14 @@ lazy val root = (project in file("."))
   .settings(
     name := "nonsense-producer",
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio"                 % ZioVersion,
-      "dev.zio" %% "zio-kafka"           % ZioKafkaVersion,
-      "dev.zio" %% "zio-config"          % ZioConfigVersion,
-      "dev.zio" %% "zio-config-typesafe" % ZioConfigVersion,
-      "dev.zio" %% "zio-config-magnolia" % ZioConfigVersion,
-      "dev.zio" %% "zio-test"            % ZioVersion % Test
+      "dev.zio"             %% "zio"                 % ZioVersion,
+      "dev.zio"             %% "zio-kafka"           % ZioKafkaVersion,
+      "dev.zio"             %% "zio-config"          % ZioConfigVersion,
+      "dev.zio"             %% "zio-config-typesafe" % ZioConfigVersion,
+      "dev.zio"             %% "zio-config-magnolia" % ZioConfigVersion,
+      "dev.zio"             %% "zio-json"            % "0.7.4",
+      "com.github.javafaker" % "javafaker"           % "1.0.2",
+      "dev.zio"             %% "zio-test"            % ZioVersion % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
