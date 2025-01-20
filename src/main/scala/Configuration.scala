@@ -2,7 +2,7 @@ import zio._
 import zio.config.magnolia.deriveConfig
 import zio.config.typesafe.TypesafeConfigProvider
 
-case class Configuration(bootstrapServers: String, topic: String)
+case class Configuration(bootstrapServers: List[String], topic: String, parallelism: Int)
 
 object Configuration {
   private val config: Config[Configuration] = deriveConfig[Configuration].nested("application")
