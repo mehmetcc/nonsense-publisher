@@ -18,7 +18,13 @@ lazy val root = (project in file("."))
       "dev.zio"             %% "zio-config-magnolia" % ZioConfigVersion,
       "dev.zio"             %% "zio-json"            % "0.7.4",
       "com.github.javafaker" % "javafaker"           % "1.0.2",
+      "org.slf4j"            % "slf4j-simple"        % "2.0.16",
       "dev.zio"             %% "zio-test"            % ZioVersion % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
+
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
+
+dockerBaseImage := "eclipse-temurin:17-jdk" // Base Docker image
