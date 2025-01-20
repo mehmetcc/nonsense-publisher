@@ -11,5 +11,10 @@ object Configuration {
     ZIO
       .config[Configuration](config)
       .withConfigProvider(TypesafeConfigProvider.fromResourcePath().kebabCase)
+      .tap(configuration => ZIO.logInfo(s"""
+                                           |application configuration:
+                                           |bootstrap-servers: ${configuration.bootstrapServers.mkString(",")}
+                                           |topics: ${configuration.topic}
+                                           |""".stripMargin))
   }
 }
