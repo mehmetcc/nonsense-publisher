@@ -1,30 +1,45 @@
-version: "3.5"
+version: '3.8'
+
 services:
   zookeeper:
     image: bitnami/zookeeper:latest
-    # to survive the container restart
-    tmpfs: "/zktmp"
+    container_name: zookeeper
     environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
+      - ALLOW_ANONYMOUS_LOGIN=yes
     ports:
       - "2181:2181"
     networks:
       - kafka-network
+    tmpfs:
+      - /zktmp
 
   kafka1:
     image: bitnami/kafka:latest
+    container_name: kafka1
     depends_on:
       - zookeeper
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: INTERNAL://:9092,EXTERNAL://0.0.0.0:29092
-      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://host.docker.internal:9092,EXTERNAL://localhost:29092
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
-      # optional - enable topic auto create
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-      ALLOW_PLAINTEXT_LISTENER: "yes"
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+
+      # Expose internal SASL_PLAINTEXT on :9092, external SASL_PLAINTEXT on :29092
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://0.0.0.0:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://host.docker.internal:9092,EXTERNAL://localhost:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
+
+      # Use the INTERNAL listener for inter-broker comms, and set the mechanism
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+
+      # Configure SASL/PLAIN for the INTERNAL listener
+      - KAFKA_CFG_LISTENER_NAME_INTERNAL_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret user_admin=admin-secret;
+
+      # Configure SASL/PLAIN for the EXTERNAL listener
+      - KAFKA_CFG_LISTENER_NAME_EXTERNAL_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret user_admin=admin-secret;
+
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -35,18 +50,28 @@ services:
 
   kafka2:
     image: bitnami/kafka:latest
+    container_name: kafka2
     depends_on:
       - zookeeper
     environment:
-      KAFKA_BROKER_ID: 2
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: INTERNAL://:9093,EXTERNAL://0.0.0.0:29093
-      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://host.docker.internal:9093,EXTERNAL://localhost:29093
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
-      # optional - enable topic auto create
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-      ALLOW_PLAINTEXT_LISTENER: "yes"
+      - KAFKA_BROKER_ID=2
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+
+      # Expose internal SASL_PLAINTEXT on :9093, external SASL_PLAINTEXT on :29093
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9093,EXTERNAL://0.0.0.0:29093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://host.docker.internal:9093,EXTERNAL://localhost:29093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
+
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+
+      - KAFKA_CFG_LISTENER_NAME_INTERNAL_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret user_admin=admin-secret;
+
+      - KAFKA_CFG_LISTENER_NAME_EXTERNAL_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret user_admin=admin-secret;
+
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     ports:
       - "9093:9093"
       - "29093:29093"
@@ -57,18 +82,28 @@ services:
 
   kafka3:
     image: bitnami/kafka:latest
+    container_name: kafka3
     depends_on:
       - zookeeper
     environment:
-      KAFKA_BROKER_ID: 3
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: INTERNAL://:9094,EXTERNAL://0.0.0.0:29094
-      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://host.docker.internal:9094,EXTERNAL://localhost:29094
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
-      # optional - enable topic auto create
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-      ALLOW_PLAINTEXT_LISTENER: "yes"
+      - KAFKA_BROKER_ID=3
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+
+      # Expose internal SASL_PLAINTEXT on :9094, external SASL_PLAINTEXT on :29094
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9094,EXTERNAL://0.0.0.0:29094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://host.docker.internal:9094,EXTERNAL://localhost:29094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
+
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+
+      - KAFKA_CFG_LISTENER_NAME_INTERNAL_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret user_admin=admin-secret;
+
+      - KAFKA_CFG_LISTENER_NAME_EXTERNAL_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_CFG_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret user_admin=admin-secret;
+
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
     ports:
       - "9094:9094"
       - "29094:29094"
@@ -79,6 +114,7 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
     depends_on:
       - kafka1
       - kafka2
@@ -86,9 +122,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092,kafka2:9093,kafka3:9094
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka1:9092,kafka2:9093,kafka3:9094
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+
+      # Must match SASL_PLAINTEXT + PLAIN + same username/password
+      - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM=PLAIN
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret;
+
     networks:
       - kafka-network
 
