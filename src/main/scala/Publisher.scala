@@ -24,7 +24,15 @@ object PublisherImpl {
   val live: RLayer[Configuration, PublisherImpl] = ZLayer.scoped {
     for {
       configuration <- ZIO.service[Configuration]
-      producer      <- Producer.make(ProducerSettings(configuration.bootstrapServers))
+      producer <- Producer.make {
+                    ProducerSettings(configuration.bootstrapServers)
+                      .withProperty("security.protocol", "SASL_PLAINTEXT")
+                      .withProperty("sasl.mechanism", "PLAIN")
+                      .withProperty(
+                        "sasl.jaas.config",
+                        "org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret;"
+                      )
+                  }
     } yield PublisherImpl(producer, configuration)
   }
 }
