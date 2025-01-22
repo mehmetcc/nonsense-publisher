@@ -14,7 +14,7 @@ object Publisher {
 
 final case class PublisherImpl(producer: Producer, config: Configuration) extends Publisher {
   override def publish[T](obj: T)(implicit serializer: T => String): Task[Unit] = producer
-    .produceAsync(new ProducerRecord[String, String](config.topic, serializer(obj)), Serde.string, Serde.string)
+    .produceAsync(new ProducerRecord[String, String](config.kafka.topic, serializer(obj)), Serde.string, Serde.string)
     .tap(_ => ZIO.logInfo(s"Published ${obj.toString} on thread ${Thread.currentThread().threadId()}"))
     .catchAll(t => ZIO.logError(t.getMessage))
     .unit
@@ -25,12 +25,12 @@ object PublisherImpl {
     for {
       configuration <- ZIO.service[Configuration]
       producer <- Producer.make {
-                    ProducerSettings(configuration.bootstrapServers)
+                    ProducerSettings(configuration.kafka.bootstrapServers)
                       .withProperty("security.protocol", "SASL_PLAINTEXT")
                       .withProperty("sasl.mechanism", "PLAIN")
                       .withProperty(
                         "sasl.jaas.config",
-                        "org.apache.kafka.common.security.plain.PlainLoginModule required username=admin password=admin-secret;"
+                        s"org.apache.kafka.common.security.plain.PlainLoginModule required username=${configuration.kafka.username} password=${configuration.kafka.password};"
                       )
                   }
     } yield PublisherImpl(producer, configuration)

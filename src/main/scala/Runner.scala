@@ -5,7 +5,7 @@ import zio.{RIO, ZIO}
 object Runner {
   val forever: RIO[Publisher with Configuration, Unit] = for {
     configuration <- ZIO.service[Configuration]
-    _             <- ZIO.foreachParDiscard(1 to configuration.parallelism)(_ => effect.forever)
+    _             <- ZIO.foreachParDiscard(1 to configuration.application.parallelism)(_ => effect.forever)
   } yield ()
 
   private def effect: RIO[Publisher, Unit] = for {
